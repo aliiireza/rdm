@@ -10,5 +10,3 @@ TestClass.TestName2:
   result: fail
   req_ids: [SR-12]
   note: 'It is okay that this test failed because of XYZ'
-
-

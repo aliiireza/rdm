@@ -13,6 +13,7 @@ FILE_TO_SCHEMA = {
     # 'data/risk.yml': 'risk',
     # 'data/version.yml': 'version',
     # 'data/requirements.yml': 'requirements',
+    'data/packages.yml': 'packages',
     'data/history.yml': 'history',
 }
 
@@ -39,6 +40,27 @@ SCHEMAS = {
             }
         }
         # TODO: finish the system jsonschema
+    },
+    'packages': {
+        'type': 'object',
+        'patternProperties': {
+            '.': {
+                'type': 'object',
+                'required': ['states', 'version'],
+                'properties': {
+                    'states': {
+                        'description': 'The status of package, composed of three characters that ' \
+                                       'represent the desired state, current state, and error state ' \
+                                       'of the package.',
+                        'type': 'string',
+                    },
+                    'version': {
+                        'description': 'The version number of the package',
+                        'type': 'string',
+                    }
+                }
+            }
+        }
     },
     'history': {
         'type': 'object',

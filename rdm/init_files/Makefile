@@ -30,6 +30,12 @@ tmp/%.pdf: tmp/%.tex
 data/history.yml: $(CONFIG)
 	rdm pull $< > $@
 
+data/packages.yml: tmp/packages.txt
+	rdm format $< > $@
+
+tmp/packages.txt:
+	dpkg -l > $@
+
 .PHONY:
 clean:
 	rm -rf release/**.pdf tmp

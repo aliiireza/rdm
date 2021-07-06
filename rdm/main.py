@@ -7,6 +7,7 @@ import yaml
 from rdm.audit_for_gaps import audit_for_gaps, list_default_checklists
 from rdm.collect import collect_from_files
 from rdm.doctor import check_data_files
+from rdm.format import format_packages
 from rdm.hooks import install_hooks
 from rdm.init import init
 from rdm.pull import pull_from_project_manager
@@ -56,6 +57,8 @@ def cli(raw_arguments):
         exit_code = audit_for_gaps(args.checklist, args.files, args.list)
     elif args.command == 'checklists':
         list_default_checklists()
+    elif args.command == 'format':
+        format_packages(args.input)
     return exit_code
 
 
@@ -105,6 +108,10 @@ def parse_arguments(arguments):
     translate_parser.add_argument('format', choices=XML_FORMATS)
     translate_parser.add_argument('input')
     translate_parser.add_argument('output')
+
+    format_help = 'format list of packages gathered from dpkg'
+    format_parser = subparsers.add_parser('format', help=format_help)
+    format_parser.add_argument('input', help='Path to file containing package info')
 
     return parser.parse_args(arguments)
 
