@@ -2,10 +2,7 @@ import glob
 import os
 
 
-def audit_for_gaps(checklist_file, source_files, list_option):
-    if list_option:
-        list_default_checklists()
-        return 0
+def audit_for_gaps(checklist_file, source_files):
     if checklist_file is None:
         print("WARNING: no check list!")
         return 1
@@ -13,6 +10,17 @@ def audit_for_gaps(checklist_file, source_files, list_option):
     full_path_checklist_file = os.path.realpath(_full_file_path(checklist_file, builtins))
     already_included = {full_path_checklist_file}
     checklist = _read_checklists(_checklist_generator([full_path_checklist_file]), already_included, builtins)
+    _print_sources(checklist, source_files)
+    failing_checklist_items = list(_find_failing_checklist_items(_source_generator(source_files), checklist))
+    if failing_checklist_items:
+        _report_failures(failing_checklist_items)
+        return 3
+    else:
+        _report_success()
+        return 0
+
+
+def _print_sources(checklist, source_files):
     if len(checklist) == 0:
         print("WARNING: no check list items!")
         return 2
@@ -22,13 +30,6 @@ def audit_for_gaps(checklist_file, source_files, list_option):
         print("# Source files:")
         for source_file in source_files:
             print('#     ' + source_file)
-    failing_checklist_items = list(_find_failing_checklist_items(_source_generator(source_files), checklist))
-    if failing_checklist_items:
-        _report_failures(failing_checklist_items)
-        return 3
-    else:
-        _report_success()
-        return 0
 
 
 def _full_file_path(file_name, builtins, path=None):

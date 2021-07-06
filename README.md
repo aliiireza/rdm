@@ -1,5 +1,5 @@
-<a href="https://travis-ci.org/innolitics/rdm">
-  <img src="https://travis-ci.org/innolitics/rdm.svg?branch=master">
+<a href="https://github.com/innolitics/rdm/actions/workflows/tests.yml/">
+  <img src="https://github.com/innolitics/rdm/actions/workflows/tests.yml/badge.svg?branch=main">
 </a>
 
 # Regulatory Documentation Manager
@@ -7,20 +7,28 @@
 ## Quick Start
 
 ```
-pip install rdm
+pip install rdm[github]
 rdm init
 cd regulatory
 make
 # regulatory documents stored in the "release" directory
+
+# if pandoc is installed, you can also run
+make pdfs
+make docs
 ```
 
 ## Introduction
 
-Our Regulatory Documentation Manager (RDM) is a set of templates and python scripts for generating regulatory documents for software that is a, or is embedded in, medical devices.
+Our Regulatory Documentation Manager (RDM) is a set of Markdown templates and Python scripts which can be used to generate IEC62304 and IEC14971 regulatory documents for software that is a, or is embedded within a, medical device.
 
-*RDM is especially well-suited for early-stage software-only medical devices.*
+RDM is especially well-suited for early-stage software-only medical devices.
 
-To use RDM, one needs to know how to use Markdown and Git. For this reason, as projects and teams grow, and as people who are unfamiliar with these tools join the team, you may want to migrate some or all of the your documents to another format (e.g., Microsoft Word). RDM provides a simple mechanism for doing this when the time comes. Typically, documents which are only touched by developers will remain in RDM, but many other documents will be converted to Word Files and stored in a separate Document Management System.
+## Professional Support
+
+RDM is developed by [Innolitics](https://innolitics.com). We're a small development firm that writes software for medical devices.
+
+We provide professional support for companies implementing RDM as their regulatory documentation solution. We can provide training, custom integrations, and workflow optimization for your software development team. Email us at [sales@innolitics.com](mailto:sales@innolitics.com) to learn more.
 
 ## Our Philosophy on Regulations
 
@@ -39,9 +47,9 @@ The best companies follow the regulations with a degree of faith that these regu
 RDM is designed to be used within a typical software development workflow.  When a new project is started, developers
 
 1. Install RDM using `pip install rdm`
-2. Generate a set of documents, which are stored in the git repository, using `rdm init`
+2. Generate a set of markdown templates, which are stored in the git repository, using `rdm init`
 3. Edit configuration variables in the generated files
-4. Write _software requirements_ in a YAML file, also stored in the git repository
+4. Write _software requirements_ and store them in the git repository
 5. Generate a top-level architecture document, also stored in the repository, which may subdivide the project into smaller _software items_
 6. Tickets (e.g. GitHub Issues) are labeled with one or more requirement ids
 7. Each commit messages must include a reference to the ticket that is being worked on
@@ -49,7 +57,7 @@ RDM is designed to be used within a typical software development workflow.  When
 9. Write new architecture documents as new _software items_ are implemented
 10. Once a new _release_ is cut, generate a set of IEC62304 documents using `rdm release`
 11. Run `rdm gap [some checklist] release/*.md` to check for missing items
-12. These markdown files can then be converted to PDFs or Word documents using a tool such as [Pandoc](https://pandoc.org)
+12. These markdown files can then be converted to PDFs (`make pdfs`) or Word documents (`make docs`)
 
 ## Our Design Goals for RDM
 
@@ -67,51 +75,50 @@ RDM is designed to be used within a typical software development workflow.  When
 - Jinja2 2.7+
 - PyYAML
 - gitpython
-- jsonschema
 - pygithub (optional, required when using GitHub as your project manager)
-- Pandoc and Latex (optional, required for PDF generation)
-- Reportlab and Svglib (optional, required to include SVGs in PDFs)
+- Pandoc 2.14 and pdflatex (optional, required for PDF generation)
 
 ## Installation
 
 `pip install rdm`
 
-or, if you need svg and github support:
+or, if you need GitHub support:
 
-`pip install rdm[svg,github]`
+`pip install rdm[github]`
 
-## User Guide
+## The Init Files
 
-Run `rdm init` to generate a set of base documents for a project.  By default these documents are placed in the current working directory in a new directory named `regulatory`, including:
+Run `rdm init` to generate a set of base documents for a project.  By default these documents are placed in the current working directory in a new directory named `regulatory` which includes a number of files. All of these are meant to be modified for your project.
 
-- A `Makefile` for compiling documents.
-- A `config.yml` file for configuring RDM.
-- Regulatory document templates are in the `documents` directory.
-- Data used for generating templates is stored in YAML files within the `data` directory.
-- Images are stored in the `images` directory
-- Temporarily generated files are stored in `tmp`.
-- The final compiled release documents are stored in the `release` directory.
-
-## Document Formats
-
-Release documents are produced in two different formats:
-
-1. [GitHub-Flavored Markdown](https://guides.github.com/features/mastering-markdown/) with standardized YAML front matter
-2. PDFs
-
-Typically, the current markdown version of the relevant documents are stored in the git repository, so that they can be easily browsed and linked to by developers.
-
-Compile the release markdown documents by running `make`.
-
-The PDF versions are generated for submission to regulatory bodies or for upload to other document control systems.
-
-Compile the release PDF documents by running `make pdfs`.
+| File | Purpose |
+| --- | --- |
+| `Makefile` | Contains recipes for compiling the markdown templates and data files into the release documents |
+| `config.yml` | Settings that alter `rdm`s behaviour |
+| `pandoc_pdf.yml` | Pandoc settings that are used when compiling the release PDFs from the release markdown documents |
+| `template.tex` | Pandoc latex template that is used to create the release PDFs |
+| `pandoc_docx.yml` | Pandoc settings that are used when compiling the release Word Documents from the release markdown documents |
+| `documents/*.md` | Regulatory document templates, written using [Pandoc's flavor of markdown](https://pandoc.org/MANUAL.html#pandocs-markdown) |
+| `documents/software_plan.md` | Contains a set of IEC62304-compliant software development processes |
+| `documents/software_requirements_specification.md` | Describes the user groups, user needs, and requirements that the software must fulfill |
+| `documents/software_design_specification.md` | Describes how the software system meets the requirements |
+| `data/*.yml` | Data files that provide data that can be included in the release documents |
+| `data/device.yml` | Details about your device, e.g. the name of the project and legal manufacturer |
+| `data/predicate.yml` | If you're submitting a 510(k), includes details about your predicate device |
+| `data/history.yml` | Records from your project management backend (e.g., GitHub) which are pulled down using the `rdm pull` command |
+| `data/workflow.yml` | Variables that can be used to customize your development processes |
+| `data/soup.yml` | Details about software dependencies  |
+| `release/*.md` | The compiled release markdown files |
+| `release/*.pdf` | The compiled release PDF files (this is usually what you give to the regulatory bodies) |
+| `release/*.docx` | The compiled release DOCX files (these are useful when getting feedback from non-technical people) |
+| `tmp/*` | Temporary files |
 
 ## Templating and Data Files
 
-The markdown files support basic templating using the [Jinja templating language](http://jinja.pocoo.org/docs/latest/templates/). Data loaded from yaml files in the `data` directory are provided for context while rendering.
+The markdown files support basic templating using the [Jinja templating language](http://jinja.pocoo.org/docs/latest/templates/).
 
-We make a few modifications to the default Jinja templating.
+### Data Files
+
+Any yaml files in the `data` directory are provided as context when rendering the templates. Variables are accessed using the name of the YAML file followed by the name of the variable in that YAML file. Thus the device name, which is stored in `data/device.yml`, can be accessed in the templates using `{{ device.name }}`.
 
 ### First Pass Output
 
@@ -148,28 +155,19 @@ The manufacturer name, which must be specified in `system.yml` data document, is
 
 ## Images
 
-Both the markdown and PDFs support images.
-
-Images in the markdown documents the path the images will usually look like:
+Both the markdown and PDFs support images. An image in a markdown document will look like:
 
 ```
-![image label](../images/my-image.svg)
+![image label](./images/my-image.png)
 ```
 
-We suggest using SVGs because they are resolution independent.  SVGs are converted to PDFs to be included in the latex (and then PDF) version of the documents.
+Images are stretched to full page width and must be able to fit within a single page of a PDF document for the formatting to look normal. The path to the images must be relative to the Makefile (per the pandoc `resource-path` setting).
 
-Images must be able to fit within a single page of a PDF document for the formatting to look normal.
+Links to images are preserved in the markdown but are downloaded when compiling word documents or PDFs (using pandoc's `extract-media` setting).
 
-Note that svglib has several limitations.  As of April 2018, these include:
+Note that markdown does not support having spaces in links, thus image names can not have spaces.
 
-- style sheets are not supported (only the style attribute)
-- clipping is limited to single paths, no mask support
-- color gradients are not supported
-- transparency is not supported
-
-Also note that markdown does not support having spaces in links, thus image names can not have spaces.
-
-By default, images are stretched to full page width.
+Also note that the PDFs don't support SVG files. A Python script, in conjunction with some Makefile customizations, can be used to convert SVGs to PNGs if needed.
 
 ## Project Management Backends
 
@@ -177,13 +175,26 @@ The FDA, and other regulatory bodies, require records to prove that you are foll
 
 RDM assists in this process by providing project management backends. These backends can be customized and configured in `config.yml`. Essentially, they pull data from a project management tool and dump it into a YAML file with a standardized format. The YAML file can then be used, like any other data file, to render templates.
 
+To pull down the most up-to-date release history, run `make data/history.yml`.
+
 ### GitHub Pull Request Backend
 
-TODO: Write out documentation about this.
+The `GitHubPullRequestBackend` assumes that change requests are stored in GitHub Issues. It is the default backend.
 
-### GitHub Issue Backend
+Setting | Description
+--- | ---
+`repository` | A string pointing to the GitHub repository (e.g., `innolitics/rdm`)
+`reviews_required` | A boolean indicating whether pull-request reviews are required. The backend will warn if they are required and there are none.
 
-TODO: Write out documentation about this.
+If you have there is a `GH_API_TOKEN` environment variable set, that will be used for authentication. Otherwise, the user is prompted for their username and password.
+
+### GitLab Backend
+
+Planned
+
+### Jira Backend
+
+Planned
 
 ## Markdown Extensions
 
@@ -193,17 +204,21 @@ We have added some features to make it more convenient to include regulatory aud
 
 Auditor notes are specified with double square brackets:
 
-```html
+```
 Some specification [[62304:6.2.4]].
 ```
 
-Auditor notes are included in the default templates, but are stripped out by the `rdm.md_extensions.AuditNoteExclusionExtension` extension. They can be retained by enabling the `rdm.md_extensions.AuditNoteInclusionExtension` extension instead.
+Auditor notes can be removed using the `rdm.md_extensions.AuditNoteExclusionExtension` extension. The auditor notes plugin strips leading white before the audit note. Thus, the above example, when the extension is enabled, becomes:
+
+```
+Some specification.
+```
 
 ### Section Numbers Extension
 
 The `SectionNumberExtension` will automatically add section numbering. This will convert section number markdown like
 
-```html
+```
 ## Some Topic
 ```
 
@@ -217,7 +232,7 @@ to
 
 The `VocabularyExtension` extends `first_pass_output` to include a dictionary of words found in the trial first pass. The set of words can then be accessed as a jinja variable using `{{ first_pass_output.words }}`. More convenient is testing whether a particular word is in the document:
 
-```html
+```
 {% if first_pass_output.has('foobot') %}
 *foobot*: Automated process that implements foo.
 {% endif %}
@@ -227,67 +242,49 @@ The above definition of the example word `foobot` would only be included if the 
 
 ## Audit Checklists
 
-We include several checklists for various standards. 
-These are used by the `rdm gap` command to check output documents for appropriate references to a given standard. 
+We include several checklists for various standards.  These are used by the
+`rdm gap` command to check output documents for appropriate references to a
+given standard.
 
-For example ISO62304 requires that the device be classified according to the hazard levels 
-it could present.
-This requirement occurs in section 4.3.a of the standard.
-All of the 62304 checklists will include the following:
-```
-62304:4.3.a Software safety classification: system class
-```
-The gap analysis will report whether the keyword `62304:4.3.a` appears in the documents. 
-Hopefully it does appear and it appears at the location where the hazard classification is
-described and justified. The tool only reports whether it is present or missing.
-The additional text `Software safety classification: system class` is not used by the tool.
-It is a mnemonic to help you locate or remember where in the standard you should be looking.
+Here is the contents of the provided `62304_2015_class_b` checklist:
 
-You can create your own new or modified checklists.
-The checklists are read line by line using a very simple format:
-
-1. Except for comments and includes, the first non-white space word is treated as an expected keyword.
-2. The keyword includes all text up to either a space character or the end of the line.
-3. The descriptive text following a keyword is included in the output report whenever the
-keyword is missing.
-4. Leading white space is ignored.
-5. If the first non-white space is a '#' then the line is a comment and is ignored.
-6. If the first non-white space is the word 'include' then the following text is another checklist
-to be applied.
-7. If an include file name matches a builtin checklist, then that builtin is used 
-(For example `include 14971_2007`).
-8. If the file name does not match a built in checklist then it is treated as a file reference 
-relative to the current checklist location (For example `include ./my_special_checklist.txt`).
-9. Blank lines are ignored.
-
-We recommend making a master checklist using `include` lines in your master checklist
-to reference the various standards you intend to meet.
-For example if you have a class B device and want to meet the latest ISO 62304 standard
-as well as ISO 13485:2016 then you could use the following master checklist:
 ```
-include 62304_2006_AMD1_class_b
-include 13485_2016
-```
-To see a list of all the built in checklists:
-```
-rdm gap --list
+# Audit checklist for IEC62304 version 2006 AMD1:2015 Class B products
+#
+# This checklist is not a substitute for reading, understanding, and
+# implementing the associated standard. The descriptive phrase following each
+# keyword reference is intended only as a helpful mnemonic for locating and
+# recalling the referenced section of the standard.
+#
+include 62304_2015_class_a
+include 62304_base_class_b
+62304:5.1.12.a Identification and avoidance of common software defects: identify
+62304:5.1.12.b Identification and avoidance of common software defects: document
+62304:5.6.2 Verify software integration
+62304:5.6.3 Software integration testing
+62304:5.6.4 Software integration testing content
+62304:5.6.5 Evaluate integration test procedures
 ```
 
-To use a checklist against some source files:
+The `rdm gap` command audits a set of text files:
+
 ```
-rdm gap some_checklist some_source.md another_source.md ...
+rdm gap 62304_2015_class_b regulatory/release/*.md
 ```
 
-To see the full content of a checklist, simply leave off the source files:
-```
-rdm gap some_checklist
-```
+If any checklist keywords (e.g., `62304.5.6.5`) are absent from the provided
+text files, the command will return with a non-zero exit code and list which
+items are missing. The checklist items are searched for anywhere within the
+text files. We recommend incorporating this check into a continuous integration
+server.
 
-If you want to make a modified copy of a built in checklist direct the output of the above into a file.
-The format will be correct for a checklist which you can then edit to meet your specific needs:
-```
-rdm gap some_checklist > my_custom_checklist.txt
-```
+You can print the expanded contents of a checklist using `rdm gap checklist`.
+
+You can list the builtin checklists with `rdm gap --list`.
+
+To provide a custom checklist, use a file path for the first argument.
+
+The checklist format is described in detail [here](./docs/checklist-format.md).
 
 ## RDM's Limitations
 
@@ -298,6 +295,7 @@ rdm gap some_checklist > my_custom_checklist.txt
 - Only support using git as your version control system
 - Assumes the whole software system is in a single git repository
 - Default templates assume the whole software system has a single safety classification
+- To use RDM, one needs to know how to use Markdown and Git. For this reason, as projects and teams grow, and as people who are unfamiliar with these tools join the team, you may want to migrate some or all of the your documents to another format (e.g., Microsoft Word). RDM provides a simple mechanism for doing this when the time comes. Typically, documents which are only touched by developers will remain in RDM, but many other documents will be converted to Word Files and stored in a separate Document Management System.
 
 ## Future Work
 

@@ -11,9 +11,10 @@ description = 'Regulatory Documentation Manager'
 
 setup(
     name='rdm',
-    version='0.9.2',
+    version='0.11.0',
     description=description,
     long_description=description,
+    long_description_content_type='text/x-rst',
     url='https://github.com/innolitics/rdm',
     author='Innolitics, LLC',
     author_email='info@innolitics.com',
@@ -26,18 +27,25 @@ setup(
         'Topic :: Scientific/Engineering :: Medical Science Apps.',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
-    keywords='regulatory documentation medical iec62304 iec82304 iso14971',
+    keywords='regulatory documentation medical iec62304 iec82304 iso14971 510k',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    install_requires=['jinja2>=2.7', 'pyyaml', 'gitpython', 'jsonschema'],
+    install_requires=['jinja2>=2.7', 'pyyaml', 'gitpython'],
     extras_require={
-        'svg': ['svglib', 'reportlab'],
         'github': ['pygithub'],
-        'dev': ['check-manifest', 'sphinx', 'sphinx-autobuild', 'mock'],
-        'test': ['coverage'],
+        'dev': [
+            'pytest',
+            'flake8',
+            'check-manifest',
+            'sphinx',
+            'sphinx-autobuild',
+            'mock',
+            'docutils',
+            'coverage'
+        ]
     },
     package_data={'rdm': [
         'base/*',
@@ -48,6 +56,7 @@ setup(
         'init_files/images/*',
         'init_files/images/uimockups/*',
         'init_files/documents/*',
+        'init_files/documents/510k/*',
         'hook_files/*'
     ]},
     data_files=[],
